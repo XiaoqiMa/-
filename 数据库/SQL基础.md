@@ -9,7 +9,7 @@ CREATE VIEW 视图名称(<视图列名1>, <视图列名2>, ......) AS
 `<select 语句>`
 
 
-![image-20200426114336807](/Users/xiaoqi/Library/Application Support/typora-user-images/image-20200426114336807.png)
+![database4](../Images/database/database4.png)
 
 函数大致可以分为以下几种。 
 ● 算术函数(用来进行数值计算的函数)
@@ -42,7 +42,7 @@ CASE    WHEN <求值表达式> THEN <表达式>
 	. . . 
 	ELSE <表达式> 
 END 
-<img src="/Users/xiaoqi/Library/Application Support/typora-user-images/image-20200426114416434.png" alt="image-20200426114416434" style="zoom: 25%;" />
+![database4](../Images/database/database5.png)
 
 联结(JOIN)就是将其他表中的列添加过来，进行“添加列”的集合运算。 UNION 是以行(纵向)为单位进行操作，而联结则是以列(横向)为单位 进行的。 
 内联结(INNER JOIN) 
