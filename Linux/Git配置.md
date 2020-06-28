@@ -1,4 +1,11 @@
 # Git 配置
+
+git 学习网站
+
+https://learngitbranching.js.org/?locale=zh_CN
+
+
+
 <img src="../Images/linux/git1.png" alt="git1" style="zoom:25%;" />
 
 配置 user.name 和 user.email
@@ -137,7 +144,6 @@ git stash list 命令显示的最左一列就是stash的序号，如stash@{2} �
 
 ```
 
-
 还原
 1）找个目录执行 clone 。或
 2）用init建个git仓库，然后从备份数据库添加remote，再push到新建仓库；或者
@@ -146,10 +152,10 @@ git stash list 命令显示的最左一列就是stash的序号，如stash@{2} �
 **merge, fetch, pull**
 
 git remote -v 查看远程版本库信息
-git remote add githup <url> 添加githup远程版本库
-git fetch githup 拉取远程版本库
+git remote add github <url> 添加github远程版本库
+git fetch github 拉取远程版本库
 git merge -h 查看合并帮助信息
-git merge --allow-unrelated-histories githup/master 合并githup上的master分支（两分支不是父子关系，所以合并需要添加 --allow-unrelated-histories）
+git merge --allow-unrelated-histories github/master 合并github上的master分支（两分支不是父子关系，所以合并需要添加 --allow-unrelated-histories）
 git push github 推送同步到github仓库
 
 在不用merge用rebase的情况下怎么操作能说一下嘛？
@@ -201,3 +207,4 @@ git的rebase命令，假设当前在A分支，要基于B分支做rebase，那么
 **Git Cheat Sheet**
 
 ![vim](../Images/linux/git_cheat_sheet.png)
+
