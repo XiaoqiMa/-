@@ -1,0 +1,29 @@
+class Solution:
+    def strStr(self, haystack: str, needle: str) -> int:
+
+        if len(needle) == 0:
+            return 0
+        
+        h, n = len(haystack), len(needle)
+        h1, n1 = 0, 0
+        curr_len = 0
+        while h1 <= h - n:
+            while h1 < h and haystack[h1] == needle[n1]:
+                h1 += 1
+                n1 += 1
+                curr_len += 1
+                if curr_len == n:
+                    return h1 - n
+            
+            
+            h1 = h1 - curr_len + 1
+            n1 = 0
+            curr_len = 0
+        return -1
+
+
+
+
+        
+# runtime:32 ms
+# memory:13.7 MB
