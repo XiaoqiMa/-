@@ -1,0 +1,99 @@
+from docx import Document
+from docx.shared import Inches
+import time
+import json
+import random
+import openai
+
+def robot_print(text):
+    for char in text:
+        print(char, end="", flush=True)
+        time.sleep(random.randrange(1, 5) / 100.0)
+    print("\r")
+
+def chatword(topic, api_key, language):
+    language_map = {"cn": "Chinese", "en": "English"}
+    language = language_map[language]
+
+    output_format = {
+        "heading": "example heading",
+        "subheading": [
+            {
+                "title": "title for subheading 1",
+                "content": [
+                    {
+                        "title": "title for bullet 1",
+                        "description": "detail for bullet 1",
+                    },
+                    {
+                        "title": "title for bullet 2",
+                        "description": "detail for bullet 2",
+                    },
+                ],
+            },
+            {
+                "title": "title for subheading 2",
+                "content": [
+                    {
+                        "title": "title for bullet 1",
+                        "description": "detail for bullet 1",
+                    },
+                    {
+                        "title": "title for bullet 2",
+                        "description": "detail for bullet 2",
+                    },
+                ],
+            },
+        ],
+    }
+
+    messages = [
+        {
+            "role": "user",
+            "content": f"I'm going to prepare a word document about {topic}, please help to outline detailed about "
+                       f"this topic, output with JSON language with follow in format {output_format}, list "
+                       f"the bullet for each subheadding title as much as possible, please only return JSON "
+                       f"format and use double quotes, please return the content in {language}",
+        },
+    ]
+
+    robot_print(f"message content: {messages[0].get('content')}")
+
+    robot_print(f"I'm working hard to generate your Word about {topic}.")
+    robot_print("It may takes about a few minutes.")
+    robot_print(f"Your Word will be generated in {language}")
+
+    openai.api_key = api_key
+    completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=messages)
+    try:
+        content = completion.choices[0].message.content
+        # just replace ' to " is not a good soluation
+        # print(content)
+        content = json.loads(content.strip())
+        robot_print(f"ChatGPT response: {content}")
+        return content
+    except Exception as e:
+        print("I'm a Word assistant, your Word generate failed, please retry later..")
+        exit(1)
+
+def generate_word(word_content):
+    document = Document()
+    document.add_heading(word_content.get("heading"), 0)
+
+    sub_headding = word_content.get("subheading", [])
+    for i, page in enumerate(sub_headding):
+        page_title = page.get("title", "")
+        document.add_heading(page_title, level=1)
+
+        for paragraph in page.get("content", []):
+            document.add_paragraph(paragraph.get("title"), style="List Number")
+            document.add_paragraph(paragraph.get("description"), style="List Bullet")
+
+    document.save("demo.docx")
+    robot_print("Generate done, enjoy!")
+
+topic = "Give an eleborate instrduction about Apple Inc company"
+api_key = "xxx"
+language = "cn"
+word_content = chatword(topic, api_key, language)
+generate_word(word_content)
