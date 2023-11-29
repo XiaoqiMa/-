@@ -1,0 +1,119 @@
+import json
+import random
+import time
+
+import fitz  # PyMuPDF
+import os
+import openai
+from PyPDF2 import PdfReader, PdfWriter
+
+
+def robot_print(text_string):
+    for char in text_string:
+        print(char, end="", flush=True)
+        time.sleep(random.randrange(1, 5) / 100.0)
+    print("\r")
+
+
+def extract_images_from_pdf(pdf_path, output_folder):
+    pdf_document = fitz.open(pdf_path)
+    os.makedirs(output_folder, exist_ok=True)
+
+    for page_number in range(pdf_document.page_count):
+        page = pdf_document[page_number]
+        images = page.get_images(full=True)
+
+        for img_index, img_info in enumerate(images):
+            img_index += 1
+            image_index = img_info[0]
+            base_image = pdf_document.extract_image(image_index)
+            image_bytes = base_image["image"]
+
+            image_filename = f"{output_folder}/page{page_number + 1}_img{img_index}.png"
+            with open(image_filename, "wb") as image_file:
+                image_file.write(image_bytes)
+
+            print(f"Saved image: {image_filename}")
+
+    pdf_document.close()
+
+
+def extract_text_from_pdf(input_pdf):
+    pdf_document = fitz.open(input_pdf)
+    text = []
+
+    for page_number in range(pdf_document.page_count):
+        page = pdf_document[page_number]
+        page_text = page.get_text()
+        text.append(page_text)
+
+    pdf_document.close()
+    return text
+
+
+def extract_text_from_pdf2(input_pdf):
+    pdf_reader = PdfReader(input_pdf)
+    text = []
+    for page in pdf_reader.pages:
+        text.append(page.extract_text())
+
+    return text
+
+
+def remove_image(input_pdf, output_pdf):
+    reader = PdfReader(input_pdf)
+    writer = PdfWriter()
+
+    for page in reader.pages:
+        writer.add_page(page)
+
+    writer.remove_images()
+
+    with open(output_pdf, "wb") as f:
+        writer.write(f)
+
+
+def summarize_thesis(text_content, api_key, language):
+    language_map = {"cn": "Chinese", "en": "English"}
+    language = language_map.get(language)
+
+    output_format = {
+        "key point": [
+            "key point 1", "key point 2", "key point 3"
+        ],
+        "conclusion": "conclusion for this thesis"
+    }
+
+    message = [
+        {
+            "role": "user",
+            "content": f"Assume you are an expert in Computer Science, and you are asked to review a thesis, "
+                            f"please help to summarize the thesis according to the following text_content: "
+                            f"{text_content}, "
+                            f"list the key point outlined in this thesis (at lease 3 points),  and give a conclusion "
+                            f"about "
+                            f"this thesis, please output the result with the following format: {output_format}, please"
+                            f"only return JSON format and use double quotes, please return the text_content in "
+                            f"{language}"
+        }
+    ]
+    openai.api_key = api_key
+    completion = openai.ChatCompletion.create(model="gpt-3.5-turbo-16k", messages=message)
+    try:
+        content = completion.choices[0].message.content
+        content = json.loads(content.strip())
+        robot_print(f"ChatGPT response: {content}")
+        return content
+    except Exception as e:
+        print("please retry later...")
+        exit(1)
+
+if __name__ == "__main__":
+    # Specify the input and output PDF file paths
+    input_pdf_path = "Microlearner A fine-grained Learning Optimizer for Big Data Workloads at Microsoft.pdf"
+
+    text_list = extract_text_from_pdf2(input_pdf_path)
+    text_content = " ".join(text_list)
+    api_key = ""
+    language = "en"
+    summarize_thesis(text_content[:50000], api_key, language)
